@@ -1,0 +1,135 @@
+name: Safe Issue Triage
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  triage-issue:
+    if: github.event_name == 'issues'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label and request details when needed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
+
+          issue_json=$(cat "$GITHUB_EVENT_PATH")
+          body=$(printf '%s' "$issue_json" | jq -r '.issue.body // ""')
+
+          extract_section() {
+            local heading="$1"
+            printf '%s\n' "$body" | awk -v heading="$heading" '
+              $0 == "### " heading { capture=1; next }
+              /^### / && capture { capture=0 }
+              capture { print }
+            ' | sed '/^[[:space:]]*$/d'
+          }
+
+          normalize() {
+            printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+          }
+
+          is_weak() {
+            local value lowered
+            value=$(printf '%s' "$1" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+            lowered=$(normalize "$value")
+
+            if [ -z "$lowered" ]; then
+              return 0
+            fi
+
+            case "$lowered" in
+              "_no response_"|"na"|"n/a"|"none"|"test"|"tbd"|"hh"|"ok")
+                return 0
+                ;;
+            esac
+
+            if [ "${#lowered}" -lt 4 ]; then
+              return 0
+            fi
+
+            return 1
+          }
+
+          summary=$(extract_section "Summary")
+          steps=$(extract_section "Steps to Reproduce")
+          expected=$(extract_section "Expected Behavior")
+          actual=$(extract_section "Actual Behavior")
+          environment=$(extract_section "Environment")
+
+          missing_fields=""
+          for field_name in summary steps expected actual environment; do
+            field_value=$(eval "printf '%s' \"\${$field_name}\"")
+            if is_weak "$field_value"; then
+              missing_fields="${missing_fields}${missing_fields:+, }$field_name"
+            fi
+          done
+
+          gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label needs-triage >/dev/null
+
+          if [ -n "$missing_fields" ]; then
+            gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label needs-info >/dev/null
+
+            existing_comment=$(gh api "repos/$REPO/issues/$ISSUE_NUMBER/comments" --paginate --jq '.[] | select(.body | contains("safe-triage:needs-info")) | .id' | head -n 1)
+            if [ -z "$existing_comment" ]; then
+              comment_body=$(printf '%s\n' \
+                '<!-- safe-triage:needs-info -->' \
+                'Thanks for the report. More detail is needed before engineering can act on it.' \
+                '' \
+                "Please update this issue with concrete values for: $missing_fields." \
+                '' \
+                'Minimum required detail:' \
+                '- exact steps to reproduce' \
+                '- expected behavior' \
+                '- actual behavior' \
+                '- environment details' \
+                '' \
+                'Once updated, the issue will stay in triage automatically.')
+              gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "$comment_body"
+            fi
+          else
+            gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --remove-label needs-info >/dev/null || true
+          fi
+
+  maintainer-commands:
+    if: github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '/accept')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Accept issue from trusted maintainer only
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          set -euo pipefail
+
+          permission=$(gh api "repos/$REPO/collaborators/$ACTOR/permission" -q .permission)
+          case "$permission" in
+            admin|maintain|write)
+              ;;
+            *)
+              echo "Ignoring /accept from $ACTOR with permission $permission"
+              exit 0
+              ;;
+          esac
+
+          gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label accepted --remove-label needs-info --remove-label needs-triage >/dev/null || true
+
+          existing_comment=$(gh api "repos/$REPO/issues/$ISSUE_NUMBER/comments" --paginate --jq '.[] | select(.body | contains("safe-triage:accepted")) | .id' | head -n 1)
+          if [ -z "$existing_comment" ]; then
+            comment_body=$(printf '%s\n' \
+              '<!-- safe-triage:accepted -->' \
+              'This report has been accepted for internal engineering review. Public updates will be posted here when they are safe to disclose.')
+            gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "$comment_body"
+          fi
