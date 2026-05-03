@@ -1,0 +1,24 @@
+
+# === ab2bc-security baseline (auto-applied) ===
+*.key
+*.keys
+*.keystore
+*.pem
+*.p12
+*.pfx
+*WALLET*CREDENTIALS*
+*WALLET-CREDENTIALS*
+*.YAML.keys
+sui.keystore
+.env
+.env.*
+!.env.example
+!.env.template
+!.env.sample
+secrets/
+*.secret
+*-secret.*
+*.private
+*.priv
+deploy-*.zip
+genesis*.YAML.keys
