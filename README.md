@@ -1,18 +1,18 @@
 # RE Project — QA Issue Tracking Dashboard
 
-**Auto-generated:** 2026-05-05T09:00:59.602Z · **Repo:** [ab2bc/RE-issues](https://github.com/ab2bc/RE-issues/issues)
+**Auto-generated:** 2026-05-05T09:28:58.783Z · **Repo:** [ab2bc/RE-issues](https://github.com/ab2bc/RE-issues/issues)
 
 ## Summary
 
 | Metric | Count |
 |--------|------:|
-| Open issues | 93 |
+| Open issues | 107 |
 | Closed issues | 0 |
-| Total filed | 93 |
-| Open sev-1 | 28 |
+| Total filed | 107 |
+| Open sev-1 | 29 |
 | Open sev-2 | 37 |
-| Open sev-3 | 27 |
-| qa-stuck (autofix gave up) | 14 |
+| Open sev-3 | 39 |
+| qa-stuck (autofix gave up) | 26 |
 | qa-flake (intermittent) | 0 |
 
 ### Open by phase
@@ -23,8 +23,10 @@
 | qa-phase-01 | 20 |
 | qa-phase-02 | 19 |
 | qa-phase-00 | 17 |
+| qa-phase-07 | 7 |
+| qa-phase-09 | 5 |
 | qa-phase-03 | 4 |
-| qa-phase-07 | 2 |
+| qa-phase-08 | 3 |
 | qa-phase-06 | 2 |
 | qa-phase-05 | 2 |
 
@@ -32,9 +34,9 @@
 
 | Severity | Open |
 |---|---|
+| sev-3 | 39 |
 | sev-2 | 37 |
-| sev-1 | 28 |
-| sev-3 | 27 |
+| sev-1 | 29 |
 
 ### Open by subsystem
 
@@ -44,8 +46,10 @@
 | subsystem:smart-contracts | 20 |
 | subsystem:chain-infra | 19 |
 | subsystem:infra | 18 |
-| subsystem:backend | 4 |
-| subsystem:journeys | 2 |
+| subsystem:journeys | 6 |
+| subsystem:security | 5 |
+| subsystem:backend | 5 |
+| subsystem:performance | 3 |
 | subsystem:commerce | 2 |
 | subsystem:crosscutting | 1 |
 
@@ -53,14 +57,15 @@
 
 | Flag | Open |
 |---|---|
-| needs-triage | 92 |
-| qa-stuck | 14 |
+| needs-triage | 106 |
+| qa-stuck | 26 |
 
 
 ## Top open sev-1/sev-2 (latest 20)
 
 | # | Title | Sev | Updated |
 |---|-------|-----|---------|
+| #94 | [Phase 07][backend] M2C backend /api/users/wallet/:addr returns wrong response f | sev-1 | 2026-05-05 |
 | #87 | [Phase 03][backend] /api/health endpoint not found | sev-2 | 2026-05-05 |
 | #80 | [Phase 00][infra] Required CLI tools missing: sui, psql, docker not found in env | sev-2 | 2026-05-05 |
 | #79 | [Phase 00][infra] Required environment variables missing: QA_M2C_API, QA_RPC_URL | sev-2 | 2026-05-05 |
@@ -80,28 +85,27 @@
 | #56 | [Phase 04][wallet] Sui CLI tool missing; cannot perform cross-device wallet deri | sev-1 | 2026-05-05 |
 | #55 | [Phase 04][wallet] Sui CLI tool missing; cannot perform wallet account policy ve | sev-2 | 2026-05-05 |
 | #53 | [Phase 04][wallet] Sui CLI tool missing; cannot perform wallet account naming fl | sev-2 | 2026-05-05 |
-| #52 | [Phase 04][wallet] Sui CLI and psql tools missing; cannot perform wallet dedupli | sev-1 | 2026-05-05 |
 
 
 ## Recently filed (latest 15)
 
 | # | Title | Created |
 |---|-------|---------|
+| #107 | [QA env gap] browser-automation-missing blocks phase 09 (security) | 2026-05-05 |
+| #106 | [QA env gap] db-unreachable blocks phase 09 (security) | 2026-05-05 |
+| #105 | [QA env gap] docker-unavailable blocks phase 09 (security) | 2026-05-05 |
+| #104 | [QA env gap] fixture-missing blocks phase 09 (security) | 2026-05-05 |
+| #103 | [QA env gap] misc-env-gap blocks phase 09 (security) | 2026-05-05 |
+| #102 | [QA env gap] browser-automation-missing blocks phase 08 (performance) | 2026-05-05 |
+| #101 | [QA env gap] docker-unavailable blocks phase 08 (performance) | 2026-05-05 |
+| #100 | [QA env gap] fixture-missing blocks phase 08 (performance) | 2026-05-05 |
+| #99 | [QA env gap] docker-unavailable blocks phase 07 (journeys) | 2026-05-05 |
+| #98 | [QA env gap] db-unreachable blocks phase 07 (journeys) | 2026-05-05 |
+| #97 | [QA env gap] fixture-missing blocks phase 07 (journeys) | 2026-05-05 |
+| #96 | [QA env gap] agent-no-response blocks phase 07 (journeys) | 2026-05-05 |
+| #95 | 🧭 QA Tracking — 2026-05-05 production run | 2026-05-05 |
+| #94 | [Phase 07][backend] M2C backend /api/users/wallet/:addr returns wrong response f | 2026-05-05 |
 | #93 | [QA env gap] misc-env-gap blocks phase 07 (journeys) | 2026-05-05 |
-| #92 | [QA env gap] browser-automation-missing blocks phase 07 (journeys) | 2026-05-05 |
-| #91 | [QA env gap] fixture-missing blocks phase 06 (crosscutting) | 2026-05-05 |
-| #90 | [Phase 06][infra] Alertmanager missing route for sev-3 severity level | 2026-05-05 |
-| #89 | [QA env gap] misc-env-gap blocks phase 05 (commerce) | 2026-05-05 |
-| #88 | [QA env gap] docker-unavailable blocks phase 05 (commerce) | 2026-05-05 |
-| #87 | [Phase 03][backend] /api/health endpoint not found | 2026-05-05 |
-| #86 | [QA env gap] docker-unavailable blocks phase 02 (chain-infra) | 2026-05-05 |
-| #85 | [QA env gap] misc-env-gap blocks phase 02 (chain-infra) | 2026-05-05 |
-| #84 | [QA env gap] fixture-missing blocks phase 02 (chain-infra) | 2026-05-05 |
-| #83 | [QA env gap] fixture-missing blocks phase 01 (smart-contracts) | 2026-05-05 |
-| #82 | [QA env gap] misc-env-gap blocks phase 01 (smart-contracts) | 2026-05-05 |
-| #81 | [QA env gap] sui-cli-missing blocks phase 01 (smart-contracts) | 2026-05-05 |
-| #80 | [Phase 00][infra] Required CLI tools missing: sui, psql, docker not found in env | 2026-05-05 |
-| #79 | [Phase 00][infra] Required environment variables missing: QA_M2C_API, QA_RPC_URL | 2026-05-05 |
 
 
 ## Quick links
