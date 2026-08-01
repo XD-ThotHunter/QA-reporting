@@ -2,19 +2,17 @@ import discord
 from discord.ext import commands
 import os
 
-# Configuration: Replace these with actual Role IDs and Channel ID
-# These can be loaded from .env in production
-REACTION_CHANNEL_ID = 123456789012345678  # Replace with the actual #choose-your-roles channel ID
+# Configuration: Load Channel ID from environment variables
+REACTION_CHANNEL_ID = int(os.getenv("REACTION_CHANNEL_ID", "123456789012345678"))
 MESSAGE_ID = None  # We will store the message ID of the reaction menu here
 
-# Emoji to Role ID mapping
-# Add the actual role IDs created in the Discord server
+# Emoji to Role Name mapping
 ROLE_MAPPING = {
-    "🇺🇸": 111111111111111111,  # English role ID
-    "🇪🇸": 222222222222222222,  # Espanol role ID
-    "🇫🇷": 333333333333333333,  # Francais role ID
-    "💻": 444444444444444444,  # Developer role ID
-    "📈": 555555555555555555   # Industry Interest role ID
+    "🇺🇸": "English",
+    "🇪🇸": "Español",
+    "🇫🇷": "Français",
+    "💻": "Developer",
+    "📈": "Industry Interest"
 }
 
 intents = discord.Intents.default()
@@ -50,6 +48,13 @@ async def setup_roles(ctx):
     
     msg = await channel.send(text)
     
+    # Ensure roles exist in the server
+    for emoji, role_name in ROLE_MAPPING.items():
+        existing_role = discord.utils.get(ctx.guild.roles, name=role_name)
+        if not existing_role:
+            await ctx.guild.create_role(name=role_name, mentionable=True)
+            print(f"Created role: {role_name}")
+
     # Add initial reactions
     for emoji in ROLE_MAPPING.keys():
         await msg.add_reaction(emoji)
@@ -68,10 +73,10 @@ async def on_raw_reaction_add(payload):
         return
 
     guild = bot.get_guild(payload.guild_id)
-    role_id = ROLE_MAPPING.get(str(payload.emoji))
+    role_name = ROLE_MAPPING.get(str(payload.emoji))
     
-    if role_id:
-        role = guild.get_role(role_id)
+    if role_name:
+        role = discord.utils.get(guild.roles, name=role_name)
         if role:
             await payload.member.add_roles(role)
             print(f"Assigned {role.name} to {payload.member.display_name}")
@@ -88,10 +93,10 @@ async def on_raw_reaction_remove(payload):
     if not member:
         return
 
-    role_id = ROLE_MAPPING.get(str(payload.emoji))
+    role_name = ROLE_MAPPING.get(str(payload.emoji))
     
-    if role_id:
-        role = guild.get_role(role_id)
+    if role_name:
+        role = discord.utils.get(guild.roles, name=role_name)
         if role:
             await member.remove_roles(role)
             print(f"Removed {role.name} from {member.display_name}")
